@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8' />
+  <title>USAID Where We Work</title>
+  <!-- Add Mapbox GL JS JavaScript file -->
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js'></script>
+  <!-- Add in the Mapbox GL JS CSS file -->
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css' rel='stylesheet' />
+  <!-- Add CSS styling info for the map -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style type="text/css">
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  h2,
+  h3 {
+    margin: 10px;
+    font-size: 1.2em;
+  }
+
+  h3 {
+    font-size: 1em;
+  }
+
+  p {
+    font-size: 0.85em;
+    margin: 10px;
+    text-align: left;
+  }
+
+  img{
+    border-radius: 10px;
+  }
+
+  /**
+  * Create a position for the map
+  * on the page */
+  #map {
+    position: absolute;
+    top: 0px;
+    bottom: 0;
+    width: 100%;
+  }
+
+  /**
+  * Set rules for how the map overlays
+  * (information box and legend) will be displayed
+  * on the page. */
+  .map-overlay {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.8);
+    margin-right: 20px;
+    font-family: Arial, sans-serif;
+    overflow: auto;
+    border-radius: 8px;
+  }
+
+  #features {
+    top: 0px;
+    height: 100px;
+    margin-top: 20px;
+    width: 250px;
+  }
+
+  .logo {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    margin-right: 20px;
+    opacity: 0.85;
+  }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- Add a div to give the map somewhere to go -->
+  <div id='map'></div>
+  <div class='map-overlay' id='features'><h2>Where We Work</h2><div id='pd'><p>Hover over a country</p></div></div>
+  <div class='logo'><img src="usaid_logo8.png" alt="USAID" width="500px"></div>
+  <script>
+    // Section 1: add map style and layout
+    var transformRequest = (url, resourceType) => {
+    var isMapboxRequest =
+      url.slice(8, 22) === "api.mapbox.com" ||
+      url.slice(10, 26) === "tiles.mapbox.com";
+    return {
+      url: isMapboxRequest
+        ? url.replace("?", "?pluginName=sheetMapper&")
+        : url
+    };
+  };
+    // Add your access token
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY2F3aWxsaWFtcyIsImEiOiJja2xsZ3pxdmczaDZjMndxZXB2aXdrdTZ3In0.TBD0QCuYQMkeamI_srV2XQ';
+    // Create a variable called "map" to house your map
+    var map = new mapboxgl.Map({
+      container: 'map', // container id
+      style: 'mapbox://styles/cawilliams/ckox99c0i0uii18lpofb2dbo5', // replace this with your style URL
+      center: [-28.0791, 17.5454], // starting position [lng, lat]
+      zoom: 5, // starting zoom
+      transformRequest: transformRequest
+    });
+
+    map.on('load', function() {
+      map.getCanvas().style.cursor = 'default';
+      // set map bounds to the continental US
+      map.fitBounds([
+        [-139, 2],
+        [143, 60]
+        ]);
+
+          // Add the information window
+          map.on('mousemove', function(e) {
+            var country = map.queryRenderedFeatures(e.point, {
+              layers: ['usaid-countries-9smxff']
+              });
+
+              if (country.length > 0) {
+                document.getElementById('pd').innerHTML = '<h3><strong>' + country[0].properties.ADMIN ;
+                } else {
+                  document.getElementById('pd').innerHTML = '<p>Hover over a country</p>';
+                  }
+              });
+          });
+
+      map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
+  </script>
+</body>
