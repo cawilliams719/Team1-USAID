@@ -6,4 +6,11 @@ Tools Used:
 Mapbox GL JS
 
 Data Used:
-USAID 
+USAID - [Activity Locations & Descriptions](https://data.usaid.gov/Evaluation/USAID-Activity-Locations-Activity-Descriptions/jusn-k97d)
+
+Current Issues:
+Some slight functionality issues that can be improved upon including...
+  1. Toggle Double Click Issue
+  2. Loading large dataset
+  3. Popup window not closing when hiding layers
+* See [Issues page](https://github.com/cawilliams719/Team1-USAID/issues) for further detail
