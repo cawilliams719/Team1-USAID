@@ -135,11 +135,12 @@
     background: #fff;
     position: absolute;
     z-index: 1;
-    top: 20px;
-    right: 20px;
+    top: 10px;
+    right: 10px;
     border-radius: 3px;
     width: 120px;
-    border: 1px solid rgba(78, 82, 89, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    font-family: 'Open Sans', sans-serif;
   }
 
   #menu a {
@@ -150,7 +151,7 @@
     padding: 0;
     padding: 10px;
     text-decoration: none;
-    border-bottom: 1px solid rgba(78, 82, 89, 0.25);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
     text-align: center;
   }
 
@@ -159,17 +160,17 @@
   }
 
   #menu a:hover {
-    background-color: #e4e7ed;
+    background-color: #f8f8f8;
     color: #404040;
   }
 
-  #menu a.active_ {
-    background-color: #757a85;
+  #menu a.active {
+    background-color: #535459;
     color: #ffffff;
   }
 
-  #menu a.active_:hover {
-    background: #b7bdc9;
+  #menu a.active:hover {
+    background: #404042;
   }
   </style>
 </head>
@@ -383,40 +384,52 @@
         // If these two layers have been added to the style,
         // add the toggle buttons.
         if (map.getLayer('Activity') && map.getLayer('Story')) {
-        // Enumerate ids of the layers.
-        var toggleableLayerIds = ['Activity', 'Story'];
-        // Set up the corresponding toggle button for each layer.
-        for (var i = 0; i < toggleableLayerIds.length; i++) {
-        var id = toggleableLayerIds[i];
-        if (!document.getElementById(id)) {
-          // Create a link.
-          var link = document.createElement('a');
-          link.id = id;
-          link.href = '#';
-          link.textContent = id;
-          link.className = 'active_';
-          // Show or hide layer when the toggle is clicked.
-          link.onclick = function(e) {
-              var clickedLayer = this.textContent;
-              e.preventDefault();
-              e.stopPropagation();
-              for (var j = 0; j < toggleableLayerIds.length; j++) {
-                  if (clickedLayer === toggleableLayerIds[j]) {
-                  	layers.children[j].className = 'active_';
-                  	map.setLayoutProperty(toggleableLayerIds[j], 'visibility', 'visible');
-                  }
-                  else {
-                  	layers.children[j].className = '';
-                  	map.setLayoutProperty(toggleableLayerIds[j], 'visibility', 'none');
-                  }
-              }
-          };
+            // Enumerate ids of the layers.
+            var toggleableLayerIds = ['Activity', 'Story'];
+            // Set up the corresponding toggle button for each layer.
+            for (var i = 0; i < toggleableLayerIds.length; i++) {
+                var id = toggleableLayerIds[i];
+                if (!document.getElementById(id)) {
+                    // Create a link.
+                    var link = document.createElement('a');
+                    link.id = id;
+                    link.href = '#';
+                    link.textContent = id;
+                    link.className = 'active';
+                    // Show or hide layer when the toggle is clicked.
+                    link.onclick = function (e) {
+                        var clickedLayer = this.textContent;
+                        e.preventDefault();
+                        e.stopPropagation();
 
-          var layers = document.getElementById('menu');
-          layers.appendChild(link);
+                        var visibility = map.getLayoutProperty(
+                            clickedLayer,
+                            'visibility'
+                        );
+
+                        // Toggle layer visibility by changing the layout object's visibility property.
+                        if (visibility === 'visible') {
+                            map.setLayoutProperty(
+                                clickedLayer,
+                                'visibility',
+                                'none'
+                            );
+                            this.className = '';
+                        } else {
+                            this.className = 'active';
+                            map.setLayoutProperty(
+                                clickedLayer,
+                                'visibility',
+                                'visible'
+                            );
+                        }
+                    };
+
+                    var layers = document.getElementById('menu');
+                    layers.appendChild(link);
+                }
+            }
         }
-      }
-    }
-  });
+    });
   </script>
 </body>
