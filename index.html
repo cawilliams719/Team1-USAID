@@ -256,18 +256,6 @@
                 'circle-color': '#e03669',
               },
             });
-            map.addLayer({
-              'id': 'TEST',
-              'type': 'circle',
-              'source': {
-                'type': 'geojson',
-                'data': data
-              },
-              'paint': {
-                'circle-radius': 5,
-                'circle-color': 'purple',
-              },
-            });
             // When a click event occurs on a feature in the Activity layer, open a popup at the
                         // location of the feature, with description HTML from its properties.
                         map.on('click', 'Activity', function (e) {
@@ -311,6 +299,79 @@
                     });
                   };
                 });
+                // Add Story Data from google sheet
+                $(document).ready(function () {
+                  $.ajax({
+                    type: "GET",
+                    // USAID Story google sheet link:https://docs.google.com/spreadsheets/d/118nKmFhqSo9SpS-Zuqy8R5ojwCo8UrvjHM5zD7xuIeI/edit?usp=sharing
+                    url: 'https://docs.google.com/spreadsheets/d/118nKmFhqSo9SpS-Zuqy8R5ojwCo8UrvjHM5zD7xuIeI/gviz/tq?tqx=out:csv&sheet=Sheet1',
+                    dataType: "text",
+                    success: function (Story) { makeGeoJSON(Story); }
+                  });
+                  function makeGeoJSON(Story) {
+                    csv2geojson.csv2geojson(Story, {
+                      latfield: 'y',
+                      lonfield: 'x',
+                      delimiter: ','
+                    }, function (err, data) {
+                      map.on('load', function () {
+                        //Add the the layer to the map
+                        map.addLayer({
+                          'id': 'Story',
+                          'type': 'circle',
+                          'source': {
+                            'type': 'geojson',
+                            'data': data
+                          },
+                          'paint': {
+                            'circle-radius': 5,
+                            'circle-color': '#7fa0e3',
+                          },
+                        });
+
+                        // When a click event occurs on a feature in the Activity layer, open a popup at the
+                                    // location of the feature, with description HTML from its properties.
+                                    map.on('click', 'Story', function (e) {
+                                      var coordinates = e.features[0].geometry.coordinates.slice();
+
+                                      //set popup text
+                                      //You can adjust the values of the popup to match the headers of your CSV.
+                                      // For example: e.features[0].properties.Name is retrieving information from the field Name in the original CSV.
+                                      var description = `<h3>` + e.features[0].properties.Country + `</h3>`+ `<h4>` + `<b>` + `Story: ` + `</b>` + e.features[0].properties.Story + `</h4>`;
+
+                                      // Ensure that if the map is zoomed out such that multiple
+                                      // copies of the feature are visible, the popup appears
+                                      // over the copy being pointed to.
+                                      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                                        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                                      }
+
+                                      //add Popup to map
+
+                                      new mapboxgl.Popup()
+                                        .setLngLat(coordinates)
+                                        .setHTML(description)
+                                        .addTo(map);
+                                    });
+
+                                    // Change the cursor to a pointer when the mouse is over the places layer.
+                                    map.on('mouseenter', 'Story', function () {
+                                      map.getCanvas().style.cursor = 'pointer';
+                                    });
+
+                                    // Change it back to a pointer when it leaves.
+                                    map.on('mouseleave', 'places', function () {
+                                      map.getCanvas().style.cursor = '';
+                                    });
+
+                                    var bbox = turf.bbox(data);
+                                    map.fitBounds(bbox, { padding: 50 });
+
+                                  });
+
+                                });
+                              };
+                            });
 
 
       // Add Zoom In/Out and North controls
@@ -321,9 +382,9 @@
       map.on('idle', function () {
         // If these two layers have been added to the style,
         // add the toggle buttons.
-        if (map.getLayer('Activity') && map.getLayer('TEST')) {
+        if (map.getLayer('Activity') && map.getLayer('Story')) {
         // Enumerate ids of the layers.
-        var toggleableLayerIds = ['Activity', 'TEST'];
+        var toggleableLayerIds = ['Activity', 'Story'];
         // Set up the corresponding toggle button for each layer.
         for (var i = 0; i < toggleableLayerIds.length; i++) {
         var id = toggleableLayerIds[i];
