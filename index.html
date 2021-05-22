@@ -11,6 +11,7 @@
   <!-- Add CSS styling info for the map -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style type="text/css">
+  /* Basic styling for Web page including structure and text */
   body {
     margin: 0;
     padding: 0;
@@ -36,9 +37,7 @@
     border-radius: 10px;
   }
 
-  /**
-  * Create a position for the map
-  * on the page */
+  /* Map Container */
   #map {
     position: absolute;
     top: 0px;
@@ -47,9 +46,8 @@
   }
 
   /**
-  * Set rules for how the map overlays
-  * (information box and legend) will be displayed
-  * on the page. */
+  * Determines how features will be displayed over map
+  * including the "Where We Work" container */
   .map-overlay {
     position: absolute;
     bottom: 0;
@@ -62,6 +60,7 @@
     border-radius: 8px;
   }
 
+  /* Feature Styling for anything over map including title, logo, etc */
   #features {
     bottom: 40px;
     height: 135px;
@@ -72,6 +71,7 @@
     font-size: 20px;
   }
 
+  /* Title and Logo Container */
   .logo {
     position: absolute;
     top: 20px;
@@ -79,49 +79,52 @@
     margin-right: 20px;
     opacity: 0.95;
   }
-
   </style>
 </head>
 
 <body>
-
-  <!-- Add a div to give the map somewhere to go -->
+  <!-- Map div below to display mapbox basemap -->
   <div id='map'></div>
+  <!--divs below for features like the USAID logo and Title and Information Container-->
   <div class='map-overlay' id='features'><br><h2>Where We Work</h2><div id='pd'><p>Hover over a country</p><br></div></div>
   <div class='logo'><img src="images/usaid_logo.png" alt="USAID" width="500px"></div>
   <script>
-    // Add your access token
+    // Add access token to display map
     mapboxgl.accessToken = 'pk.eyJ1IjoiY2F3aWxsaWFtcyIsImEiOiJja2xsZ3pxdmczaDZjMndxZXB2aXdrdTZ3In0.TBD0QCuYQMkeamI_srV2XQ';
-    // Create a variable called "map" to house your map
+    // Map Variable to add basemap designed using Mapbox Studio
     var map = new mapboxgl.Map({
-      container: 'map', // container id
-      style: 'mapbox://styles/cawilliams/ckox99c0i0uii18lpofb2dbo5', // replace this with your style URL
+      container: 'map', // map container id
+      style: 'mapbox://styles/cawilliams/ckox99c0i0uii18lpofb2dbo5', // style link
       center: [-28.0791, 17.5454], // starting position [lng, lat]
       zoom: 5 // starting zoom
     });
 
+    // Determines windoe in which map is zoomed out to
     map.on('load', function() {
       map.getCanvas().style.cursor = 'default';
-      // set map bounds to the continental US
+      // set map bounds to focus on USAID country involvement
       map.fitBounds([
         [-116, 2],
         [123, 40]
         ]);
 
-          // Add the information window
+          // Add the information window for USAID - Where We Work
+          // Thi
           map.on('mousemove', function(e) {
             var country = map.queryRenderedFeatures(e.point, {
-              layers: ['usaid-countries-9smxff']
+              layers: ['usaid-countries-9smxff'] // data name when added to mapbox basemap in studio
               });
 
               if (country.length > 0) {
-                document.getElementById('pd').innerHTML = '<h3><strong>' + country[0].properties.ADMIN ;
+                document.getElementById('pd').innerHTML = '<h3><strong>' + country[0].properties.ADMIN ; // ADMIN is country name in dataset
                 } else {
-                  document.getElementById('pd').innerHTML = '<p>Hover over a country</p><br>';
+                  document.getElementById('pd').innerHTML = '<p>Hover over a country</p><br>'; // text when not hovering over USAID country
                   }
               });
           });
 
+      // Add Zoom In/Out and North controls
+      // Decided to not add geolocation as it is not necessary for this map
       map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
   </script>
 </body>
