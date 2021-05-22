@@ -4,12 +4,12 @@
 <head>
   <meta charset='utf-8' />
   <title>USAID Where We Work</title>
-  <!-- Add Mapbox GL JS JavaScript file -->
-  <script src='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js'></script>
-  <!-- Add in the Mapbox GL JS CSS file -->
-  <link href='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css' rel='stylesheet' />
-  <!-- Add CSS styling info for the map -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.css' rel='stylesheet' />
+  <script src='https://npmcdn.com/csv2geojson@latest/csv2geojson.js'></script>
+  <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
   <style type="text/css">
   /* Basic styling for Web page including structure and text */
   body {
@@ -79,6 +79,141 @@
     margin-right: 20px;
     opacity: 0.95;
   }
+
+  /* Popup styling */
+  .mapboxgl-popup {
+    padding-bottom: 5px;
+  }
+
+  .mapboxgl-popup-close-button {
+    display: none;
+  }
+
+  .mapboxgl-popup-content {
+    font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
+    padding: 0;
+    width: 250px;
+    height: 250px;
+    overflow-y: scroll;
+  }
+
+  .mapboxgl-popup-content-wrapper {
+    padding: 1%;
+  }
+
+  .mapboxgl-popup-content h3 {
+    background: rgb(61, 59, 59);
+    text-align: center;
+    color: #fff;
+    margin: 0;
+    display: block;
+    padding: 15px;
+    font-weight: 700;
+    margin-top: -5px;
+  }
+
+  .mapboxgl-popup-content h4 {
+    margin: 0;
+    display: block;
+    padding: 10px 3px 10px 10px;
+    font-weight: 400;
+  }
+
+  .mapboxgl-container {
+    cursor: pointer;
+  }
+
+  .mapboxgl-popup-anchor-top>.mapboxgl-popup-content {
+    margin-top: 3px;
+  }
+
+  .mapboxgl-popup-anchor-top>.mapboxgl-popup-tip {
+    border-bottom-color: rgb(61, 59, 59);
+  }
+  /* Styling for Information Console with legend, data links, etc */
+  #console {
+    position: absolute;
+    top: 250px;
+    margin: 20px;
+    width: 280px;
+    height: 45%;
+    bottom: 0;
+    background-color: #545757;
+    opacity: 0.8;
+    box-shadow: 2.5px 2.5px 5px grey;
+    padding: 10px 20px;
+    overflow-y: scroll;
+  }
+
+  .session {
+    margin-bottom: 20px;
+  }
+
+  .row {
+    height: 20px;
+    width: 100%;
+  }
+
+  .colors {
+    background: linear-gradient(to right,
+      #4575b4,
+      #74add1,
+      #abd9e9,
+      #e0f3f8,
+      #fee090,
+      #fdae61,
+      #f46d43,
+      #d73027);
+    margin-bottom: 5px;
+  }
+
+  .label {
+    width: 11%;
+    display: inline-block;
+    text-align: center;
+  }
+
+  /* Toggle Layer styling */
+  #menu {
+    background: #fff;
+    position: absolute;
+    z-index: 1;
+    top: 280px;
+    right: 20px;
+    border-radius: 3px;
+    width: 120px;
+    border: 1px solid rgba(0, 0, 0, 0.4);
+  }
+
+  #menu a {
+    font-size: 13px;
+    color: #404040;
+    display: block;
+    margin: 0;
+    padding: 0;
+    padding: 10px;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    text-align: center;
+  }
+
+  #menu a:last-child {
+    border: none;
+  }
+
+  #menu a:hover {
+    background-color: #d9dbdb;
+    color: #404040;
+  }
+
+  #menu a.active_ {
+    background-color: #b6b9ba;
+    color: #ffffff;
+  }
+
+  #menu a.active_:hover {
+    background: #87898a;
+  }
   </style>
 </head>
 
@@ -89,6 +224,17 @@
   <div class='map-overlay' id='features'><br><h2>Where We Work</h2><div id='pd'><p>Hover over a country</p><br></div></div>
   <div class='logo'><img src="images/usaid_logo.png" alt="USAID" width="500px"></div>
   <script>
+  // Add map style and layout
+      var transformRequest = (url, resourceType) => {
+      var isMapboxRequest =
+        url.slice(8, 22) === "api.mapbox.com" ||
+        url.slice(10, 26) === "tiles.mapbox.com";
+      return {
+        url: isMapboxRequest
+          ? url.replace("?", "?pluginName=sheetMapper&")
+          : url
+      };
+    };
     // Add access token to display map
     mapboxgl.accessToken = 'pk.eyJ1IjoiY2F3aWxsaWFtcyIsImEiOiJja2xsZ3pxdmczaDZjMndxZXB2aXdrdTZ3In0.TBD0QCuYQMkeamI_srV2XQ';
     // Map Variable to add basemap designed using Mapbox Studio
@@ -96,10 +242,11 @@
       container: 'map', // map container id
       style: 'mapbox://styles/cawilliams/ckox99c0i0uii18lpofb2dbo5', // style link
       center: [-28.0791, 17.5454], // starting position [lng, lat]
-      zoom: 5 // starting zoom
+      zoom: 5, // starting zoom
+      transformRequest: transformRequest
     });
 
-    // Determines windoe in which map is zoomed out to
+    // Determines window in which map is zoomed out to
     map.on('load', function() {
       map.getCanvas().style.cursor = 'default';
       // set map bounds to focus on USAID country involvement
@@ -109,7 +256,6 @@
         ]);
 
           // Add the information window for USAID - Where We Work
-          // Thi
           map.on('mousemove', function(e) {
             var country = map.queryRenderedFeatures(e.point, {
               layers: ['usaid-countries-9smxff'] // data name when added to mapbox basemap in studio
@@ -122,9 +268,83 @@
                   }
               });
           });
+    // Add Activity Data from google sheet
+    $(document).ready(function () {
+      $.ajax({
+        type: "GET",
+        // USAID Activity google sheet link:https://docs.google.com/spreadsheets/d/1S3tFnQF0QMIQ0S850pPIa0kipmZPPeUxnUqwoOOMpUE/edit?usp=sharing
+        url: 'https://docs.google.com/spreadsheets/d/1S3tFnQF0QMIQ0S850pPIa0kipmZPPeUxnUqwoOOMpUE/gviz/tq?tqx=out:csv&sheet=Sheet1',
+        dataType: "text",
+        success: function (csvData) { makeGeoJSON(csvData); }
+      });
+      function makeGeoJSON(csvData) {
+        csv2geojson.csv2geojson(csvData, {
+          latfield: 'y',
+          lonfield: 'x',
+          delimiter: ','
+        }, function (err, data) {
+          map.on('load', function () {
+            //Add the the layer to the map
+            map.addLayer({
+              'id': 'csvData',
+              'type': 'circle',
+              'source': {
+                'type': 'geojson',
+                'data': data
+              },
+              'paint': {
+                'circle-radius': 5,
+                'circle-color': '#e03669',
+              },
+            });
+            // When a click event occurs on a feature in the csvData layer, open a popup at the
+                        // location of the feature, with description HTML from its properties.
+                        map.on('click', 'csvData', function (e) {
+                          var coordinates = e.features[0].geometry.coordinates.slice();
+
+                          //set popup text
+                          //You can adjust the values of the popup to match the headers of your CSV.
+                          // For example: e.features[0].properties.Name is retrieving information from the field Name in the original CSV.
+                          var description = `<h3>` + e.features[0].properties.Country + `</h3>` + `<h4>` + `<b>` + `Activity: ` + `</b>` + e.features[0].properties.Activity + `</h4>` + `<h4>` + `<b>` + `Sector: ` + `</b>` + e.features[0].properties.Sector + `</h4>` + `<h4>` + `<b>` + `Description: ` + `</b>` + e.features[0].properties.Description + `</h4>` + `<h4>` + `<b>` + `Start Date: ` + `</b>` + e.features[0].properties.Start + `</h4>`+  `<h4>` + `<b>` + `End Date: ` + `</b>` + e.features[0].properties.End + `</h4>` + `<h4>` + `<b>` + `Partner: ` + `</b>` + e.features[0].properties.Partner + `</h4>`;
+
+                          // Ensure that if the map is zoomed out such that multiple
+                          // copies of the feature are visible, the popup appears
+                          // over the copy being pointed to.
+                          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                          }
+
+                          //add Popup to map
+
+                          new mapboxgl.Popup()
+                            .setLngLat(coordinates)
+                            .setHTML(description)
+                            .addTo(map);
+                        });
+
+                        // Change the cursor to a pointer when the mouse is over the places layer.
+                        map.on('mouseenter', 'csvData', function () {
+                          map.getCanvas().style.cursor = 'pointer';
+                        });
+
+                        // Change it back to a pointer when it leaves.
+                        map.on('mouseleave', 'places', function () {
+                          map.getCanvas().style.cursor = '';
+                        });
+
+                        var bbox = turf.bbox(data);
+                        map.fitBounds(bbox, { padding: 50 });
+
+                      });
+
+                    });
+                  };
+                });
+
 
       // Add Zoom In/Out and North controls
       // Decided to not add geolocation as it is not necessary for this map
       map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
+
   </script>
 </body>

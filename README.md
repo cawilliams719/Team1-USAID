@@ -4,3 +4,6 @@ This repository features product 2 constructed as part of a final project in a W
 
 Tools Used:
 Mapbox GL JS
+
+Data Used:
+USAID 
