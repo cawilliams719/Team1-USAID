@@ -13,4 +13,5 @@ Some slight functionality issues that can be improved upon including...
   1. Toggle Double Click Issue
   2. Loading large dataset
   3. Popup window not closing when hiding layers
-* See [Issues page](https://github.com/cawilliams719/Team1-USAID/issues) for further detail
+
+*See [Issues page](https://github.com/cawilliams719/Team1-USAID/issues) for further detail
