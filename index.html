@@ -93,7 +93,7 @@
     font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
     padding: 0;
     width: 250px;
-    height: 250px;
+    height:150px;
     overflow-y: scroll;
   }
 
@@ -130,59 +130,16 @@
   .mapboxgl-popup-anchor-top>.mapboxgl-popup-tip {
     border-bottom-color: rgb(61, 59, 59);
   }
-  /* Styling for Information Console with legend, data links, etc */
-  #console {
-    position: absolute;
-    top: 250px;
-    margin: 20px;
-    width: 280px;
-    height: 45%;
-    bottom: 0;
-    background-color: #545757;
-    opacity: 0.8;
-    box-shadow: 2.5px 2.5px 5px grey;
-    padding: 10px 20px;
-    overflow-y: scroll;
-  }
-
-  .session {
-    margin-bottom: 20px;
-  }
-
-  .row {
-    height: 20px;
-    width: 100%;
-  }
-
-  .colors {
-    background: linear-gradient(to right,
-      #4575b4,
-      #74add1,
-      #abd9e9,
-      #e0f3f8,
-      #fee090,
-      #fdae61,
-      #f46d43,
-      #d73027);
-    margin-bottom: 5px;
-  }
-
-  .label {
-    width: 11%;
-    display: inline-block;
-    text-align: center;
-  }
-
   /* Toggle Layer styling */
   #menu {
     background: #fff;
     position: absolute;
     z-index: 1;
-    top: 280px;
+    top: 20px;
     right: 20px;
     border-radius: 3px;
     width: 120px;
-    border: 1px solid rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(78, 82, 89, 0.4);
   }
 
   #menu a {
@@ -193,7 +150,7 @@
     padding: 0;
     padding: 10px;
     text-decoration: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid rgba(78, 82, 89, 0.25);
     text-align: center;
   }
 
@@ -202,27 +159,29 @@
   }
 
   #menu a:hover {
-    background-color: #d9dbdb;
+    background-color: #e4e7ed;
     color: #404040;
   }
 
   #menu a.active_ {
-    background-color: #b6b9ba;
+    background-color: #757a85;
     color: #ffffff;
   }
 
   #menu a.active_:hover {
-    background: #87898a;
+    background: #b7bdc9;
   }
   </style>
 </head>
 
 <body>
+  <!-- Container Where User can Toggle Layer(s)-->
+  <nav id="menu"></nav>
   <!-- Map div below to display mapbox basemap -->
   <div id='map'></div>
   <!--divs below for features like the USAID logo and Title and Information Container-->
   <div class='map-overlay' id='features'><br><h2>Where We Work</h2><div id='pd'><p>Hover over a country</p><br></div></div>
-  <div class='logo'><img src="images/usaid_logo.png" alt="USAID" width="500px"></div>
+  <div class='logo'><img src="images/usaid_logo.png" alt="USAID" width="400px"></div>
   <script>
   // Add map style and layout
       var transformRequest = (url, resourceType) => {
@@ -275,10 +234,10 @@
         // USAID Activity google sheet link:https://docs.google.com/spreadsheets/d/1S3tFnQF0QMIQ0S850pPIa0kipmZPPeUxnUqwoOOMpUE/edit?usp=sharing
         url: 'https://docs.google.com/spreadsheets/d/1S3tFnQF0QMIQ0S850pPIa0kipmZPPeUxnUqwoOOMpUE/gviz/tq?tqx=out:csv&sheet=Sheet1',
         dataType: "text",
-        success: function (csvData) { makeGeoJSON(csvData); }
+        success: function (Activity) { makeGeoJSON(Activity); }
       });
-      function makeGeoJSON(csvData) {
-        csv2geojson.csv2geojson(csvData, {
+      function makeGeoJSON(Activity) {
+        csv2geojson.csv2geojson(Activity, {
           latfield: 'y',
           lonfield: 'x',
           delimiter: ','
@@ -286,7 +245,7 @@
           map.on('load', function () {
             //Add the the layer to the map
             map.addLayer({
-              'id': 'csvData',
+              'id': 'Activity',
               'type': 'circle',
               'source': {
                 'type': 'geojson',
@@ -297,9 +256,21 @@
                 'circle-color': '#e03669',
               },
             });
-            // When a click event occurs on a feature in the csvData layer, open a popup at the
+            map.addLayer({
+              'id': 'TEST',
+              'type': 'circle',
+              'source': {
+                'type': 'geojson',
+                'data': data
+              },
+              'paint': {
+                'circle-radius': 5,
+                'circle-color': 'purple',
+              },
+            });
+            // When a click event occurs on a feature in the Activity layer, open a popup at the
                         // location of the feature, with description HTML from its properties.
-                        map.on('click', 'csvData', function (e) {
+                        map.on('click', 'Activity', function (e) {
                           var coordinates = e.features[0].geometry.coordinates.slice();
 
                           //set popup text
@@ -323,7 +294,7 @@
                         });
 
                         // Change the cursor to a pointer when the mouse is over the places layer.
-                        map.on('mouseenter', 'csvData', function () {
+                        map.on('mouseenter', 'Activity', function () {
                           map.getCanvas().style.cursor = 'pointer';
                         });
 
@@ -346,5 +317,45 @@
       // Decided to not add geolocation as it is not necessary for this map
       map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
+      // Toggle Layers
+      map.on('idle', function () {
+        // If these two layers have been added to the style,
+        // add the toggle buttons.
+        if (map.getLayer('Activity') && map.getLayer('TEST')) {
+        // Enumerate ids of the layers.
+        var toggleableLayerIds = ['Activity', 'TEST'];
+        // Set up the corresponding toggle button for each layer.
+        for (var i = 0; i < toggleableLayerIds.length; i++) {
+        var id = toggleableLayerIds[i];
+        if (!document.getElementById(id)) {
+          // Create a link.
+          var link = document.createElement('a');
+          link.id = id;
+          link.href = '#';
+          link.textContent = id;
+          link.className = 'active_';
+          // Show or hide layer when the toggle is clicked.
+          link.onclick = function(e) {
+              var clickedLayer = this.textContent;
+              e.preventDefault();
+              e.stopPropagation();
+              for (var j = 0; j < toggleableLayerIds.length; j++) {
+                  if (clickedLayer === toggleableLayerIds[j]) {
+                  	layers.children[j].className = 'active_';
+                  	map.setLayoutProperty(toggleableLayerIds[j], 'visibility', 'visible');
+                  }
+                  else {
+                  	layers.children[j].className = '';
+                  	map.setLayoutProperty(toggleableLayerIds[j], 'visibility', 'none');
+                  }
+              }
+          };
+
+          var layers = document.getElementById('menu');
+          layers.appendChild(link);
+        }
+      }
+    }
+  });
   </script>
 </body>
