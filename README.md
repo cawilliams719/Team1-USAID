@@ -8,7 +8,7 @@ Mapbox GL JS
 Data Used:
 USAID - [Activity Locations & Descriptions](https://data.usaid.gov/Evaluation/USAID-Activity-Locations-Activity-Descriptions/jusn-k97d)
 
-NOTE: Although this dataset mentions location, it provides only country name information, therefore to represent this spatially, centroids by country were produced and joined with this dataset. It is important to recognize that these points do not represent an actual location of where the USAID activity is occuring but rather represents the country it is happening in. Lastly, this web map only shows some of the activity in this dataset. For more detail on USAID activity it is recommened that you view the raw dataset they provided.
+NOTE: Although this dataset mentions location, it provides only country name information, therefore to represent this spatially, centroids by country were produced and joined with this dataset. It is important to recognize that these points do not represent an actual location of where the USAID activity is occurring but rather represents the country it is happening in. Lastly, this web map only shows some of the activity in this dataset. For more detail on USAID activity it is recommended that you view the raw dataset they provided.
 
 Current Issues:
 Some slight functionality issues that can be improved upon including...
