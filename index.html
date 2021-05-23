@@ -74,10 +74,11 @@
   /* Title and Logo Container */
   .logo {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: 5px;
+    left: 15px;
     margin-right: 20px;
-    opacity: 0.95;
+    /*opacity: 0.95;*/
+    /*mix-blend-mode: multiply;*/
   }
 
   /* Popup styling */
@@ -378,10 +379,6 @@
                 });
 
 
-      // Add Zoom In/Out and North controls
-      // Decided to not add geolocation as it is not necessary for this map
-      map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
-
       // Toggle Layers - Story and Activity
       map.on('idle', function () {
         // If these two layers have been added to the style,
@@ -434,5 +431,10 @@
             }
         }
     });
+
+    // Add Zoom In/Out and North controls
+    // Decided to not add geolocation as it is not necessary for this map
+    map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
+
   </script>
 </body>
