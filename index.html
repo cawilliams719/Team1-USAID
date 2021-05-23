@@ -96,6 +96,7 @@
     width: 250px;
     height:150px;
     overflow-y: scroll;
+    /*border-radius: 5px;*/
   }
 
   .mapboxgl-popup-content-wrapper {
@@ -206,7 +207,8 @@
       style: 'mapbox://styles/cawilliams/ckox99c0i0uii18lpofb2dbo5', // style link
       center: [-28.0791, 17.5454], // starting position [lng, lat]
       zoom: 5, // starting zoom
-      transformRequest: transformRequest
+      transformRequest: transformRequest,
+      attributionControl: false // Set to false since custom attribution is used later
     });
 
     // Determines window in which map is zoomed out to
@@ -435,6 +437,11 @@
     // Add Zoom In/Out and North controls
     // Decided to not add geolocation as it is not necessary for this map
     map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
+
+    // Add Custom Attribution
+    map.addControl(new mapboxgl.AttributionControl({
+      customAttribution: 'Activity Data by <a href="https://data.usaid.gov/Evaluation/USAID-Activity-Locations-Activity-Descriptions/jusn-k97d">USAID</a>'
+    }));
 
   </script>
 </body>
