@@ -368,6 +368,9 @@
                           map.getCanvas().style.cursor = '';
                         });
 
+                        //var bbox = turf.bbox(data);
+                        //map.fitBounds(bbox, { padding: 10 });
+
                       });
 
                     });
@@ -411,6 +414,7 @@
                                 'none'
                             );
                             this.className = '';
+                            $('.mapboxgl-popup').remove(); // closes popup when layer is hidden
                         } else {
                             this.className = 'active';
                             map.setLayoutProperty(
