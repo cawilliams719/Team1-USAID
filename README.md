@@ -12,8 +12,8 @@ NOTE: Although this dataset mentions location, it provides only country name inf
 
 Current Issues:
 Some slight functionality issues that can be improved upon including...
-  1. Toggle Double Click Issue
-  2. Loading large dataset
-  3. Popup window not closing when hiding layers
+  1. Toggle Double Click Issue - FIXED
+  2. Loading large dataset -FIXED
+  3. Popup window not closing when hiding layers - somewhat FIXED (could be improved: would be ideal if popup only closed if its respective layer closed rather than either layer is turned off)
 
 *See [Issues page](https://github.com/cawilliams719/Team1-USAID/issues) for further detail
