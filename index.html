@@ -215,7 +215,7 @@
   <div class='map-overlay' id='features'><br><h2>Where We Work</h2><div id='pd'><p>Hover over a country</p><br></div></div>
   <div class='logo'><img src="images/usaid_logo.png" alt="USAID" width="350px"></div>
   <script>
-  // Add map style and layout
+    // Add map style and layout
       var transformRequest = (url, resourceType) => {
       var isMapboxRequest =
         url.slice(8, 22) === "api.mapbox.com" ||
@@ -233,7 +233,7 @@
       container: 'map', // map container id
       style: 'mapbox://styles/cawilliams/ckox99c0i0uii18lpofb2dbo5', // style link
       center: [-28.0791, 17.5454], // starting position [lng, lat]
-      zoom: 5, // starting zoom
+      zoom: 3, // starting zoom
       transformRequest: transformRequest,
       attributionControl: false // Set to false since custom attribution is used later
     });
@@ -448,14 +448,14 @@
                                 'visibility',
                                 'none'
                             );
-                            $('.mapboxgl-popup').remove()
+                              $('.mapboxgl-popup').remove(); // removes popup when any layer is turned off
                         }
 
-                        //for (var j = 0; j < toggleableLayerIds.length; j++) {
-                          //  if (clickedLayer === toggleableLayerIds[j]) {
-                            //  $('.mapboxgl-popup').remove(j)
-                            // }
-                        //  }
+                  //      for (var j = 0; j < toggleableLayerIds.length; j++) {
+                  //        if (clickedLayer === toggleableLayerIds[j]) {
+                  //          $('.mapboxgl-popup').remove(j)
+                  //        }
+                  //      }
 
                     };
 
