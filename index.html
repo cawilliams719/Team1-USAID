@@ -186,7 +186,7 @@
     text-align: center;
   }
 
-  #menu a:last-child {
+  #menu a:first-child {
     border: none;
   }
 
@@ -442,14 +442,21 @@
                             );
                             this.className = 'active';
                         } else {
-                            this.className = 'active';
+                            this.className = '';
                             map.setLayoutProperty(
                                 clickedLayer,
                                 'visibility',
                                 'none'
                             );
-                            $('.mapboxgl-popup').remove(); // closes popup when layer is hidden
+                            $('.mapboxgl-popup').remove()
                         }
+
+                        //for (var j = 0; j < toggleableLayerIds.length; j++) {
+                          //  if (clickedLayer === toggleableLayerIds[j]) {
+                            //  $('.mapboxgl-popup').remove(j)
+                            // }
+                        //  }
+
                     };
 
                     var layers = document.getElementById('menu');
